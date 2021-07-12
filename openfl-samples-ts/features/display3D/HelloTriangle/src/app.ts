@@ -17,95 +17,95 @@ import Vector from "openfl/Vector";
 
 
 class App extends Sprite {
-	
-	
+
+
 	private context3D:Context3D;
 	private program:Program3D;
 	private vertexBuffer:VertexBuffer3D;
 	private indexBuffer:IndexBuffer3D;
-	
-	
+
+
 	constructor () {
-		
+
 		super ();
-		
+
 		this.stage.stage3Ds[0].addEventListener (Event.CONTEXT3D_CREATE, this.init);
 		this.stage.stage3Ds[0].requestContext3D ();
-		
+
 	}
-	
-	
+
+
 	private init = ():void => {
-		
+
 		this.context3D = this.stage.stage3Ds[0].context3D;
 		this.context3D.configureBackBuffer (this.stage.stageWidth, this.stage.stageHeight, 1, true);
-		
+
 		this.context3D.setBlendFactors (Context3DBlendFactor.ONE, Context3DBlendFactor.ONE_MINUS_SOURCE_ALPHA);
-		
+
 		var vertices = Vector.ofArray ([
 			-0.3, -0.3, 0, 1, 0, 0,
 			-0.3, 0.3, 0, 0, 1, 0,
 			0.3, 0.3, 0, 0, 0, 1 ]);
-		
+
 		this.vertexBuffer = this.context3D.createVertexBuffer (3, 6);
 		this.vertexBuffer.uploadFromVector (vertices, 0, 3);
-		
+
 		var indices = Vector.ofArray ([ 0, 1, 2 ]);
-		
+
 		this.indexBuffer = this.context3D.createIndexBuffer (3);
 		this.indexBuffer.uploadFromVector (indices, 0, 3);
-		
+
 		var assembler = new AGALMiniAssembler ();
-		
+
 		var vertexShader = assembler.assemble (Context3DProgramType.VERTEX,
 			"m44 op, va0, vc0\n" +
 			"mov v0, va1"
 		);
-		
+
 		var fragmentShader = assembler.assemble (Context3DProgramType.FRAGMENT,
 			"mov oc, v0"
 		);
-		
+
 		this.program = this.context3D.createProgram ();
 		this.program.upload (vertexShader, fragmentShader);
-		
+
 		this.addEventListener (Event.ENTER_FRAME, this.this_onEnterFrame);
-		
+
 	}
-	
-	
-	
-	
+
+
+
+
 	// Event Handlers
-	
-	
-	
-	
+
+
+
+
 	private this_onEnterFrame = (event:Event):void => {
-		
+
 		if (this.context3D == null) {
-			
+
 			return;
-			
+
 		}
-		
+
 		this.context3D.clear (1, 1, 1, 1);
-		
+
 		this.context3D.setProgram (this.program);
 		this.context3D.setVertexBufferAt (0, this.vertexBuffer, 0, Context3DVertexBufferFormat.FLOAT_3);
 		this.context3D.setVertexBufferAt (1, this.vertexBuffer, 3, Context3DVertexBufferFormat.FLOAT_3);
-		
+
 		var m = new Matrix3D ();
 		m.appendRotation (Lib.getTimer () / 40, Vector3D.Z_AXIS);
 		this.context3D.setProgramConstantsFromMatrix (Context3DProgramType.VERTEX, 0, m, true);
-		
+
 		this.context3D.drawTriangles (this.indexBuffer);
-		
+
 		this.context3D.present ();
-		
+
 	}
-	
-	
+
+
 }
 
 
