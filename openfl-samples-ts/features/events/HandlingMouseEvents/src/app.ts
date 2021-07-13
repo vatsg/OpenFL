@@ -97,7 +97,7 @@ class App extends Sprite {
 		
 		if (this.Destination.hitTestPoint (event.stageX, event.stageY)) {
 			
-			Actuate.tween (event.target, 1, { x: this.Destination.x + 5, y: this.Destination.y + 5 } );
+			Actuate.tween (this.selectedObject, 1, { x: this.Destination.x + 5, y: this.Destination.y + 5 } );
 		}
 		
 		this.stage.removeEventListener (MouseEvent.MOUSE_MOVE, this.stage_onMouseMove);
