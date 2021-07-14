@@ -1,23 +1,26 @@
 import Sprite from "openfl/display/Sprite";
 import Stage from "openfl/display/Stage";
+import Shape from "openfl/display/Shape";
 import Point from "openfl/geom/Point";
 // import * as d3 from 'd3-force';
 import * as d3 from 'd3';
 import { graph_data } from "./graphData";
 
+console.log(graph_data);
+
 var width = 2000;
 var height = 1000;
+var nodeRadius = 10;
 var simLength = 1;
 
 class App extends Sprite {
 	
-	private circArr:Array<Sprite>;
+	private circArr:Array<Shape>;
 	private nodePts:Array<Point>; 
 	
 	constructor () {
 		
 		super ();
-		console.log(graph_data);
 		this.circArr = [];
 		this.nodePts = [];
 		
@@ -32,29 +35,37 @@ class App extends Sprite {
 			.force("link", d3.forceLink(graph_data.links))
 			.force("center", d3.forceCenter(width / 2, height / 2));
 	
+	
 	  var color = d3.scaleOrdinal(d3.schemeCategory10);
-		
-		simulation.tick(); // this will center graph on screen
+		for (let i = 0; i < 100; i++) {
+			simulation.tick(); // this will center graph on screen
+		}
 		for (let n = 0; n < simLength; n++) {
+
+			// add links
+			for (let i = 0; i < graph_data.links.length; i++) {
+				var line = new Shape();
+				line.graphics.lineStyle (1, 0x808080);
+				
+				line.graphics.moveTo(graph_data.links[i].source.x, graph_data.links[i].source.y);
+				line.graphics.lineTo(graph_data.links[i].target.x, graph_data.links[i].target.y);
+				
+				this.addChild(line);
+			}
+			
+			// add nodes
 			for (let i = 0; i < graph_data.nodes.length; i++) {
 				var pt = new Point(graph_data.nodes[i].x, graph_data.nodes[i].y);
-				var circle = new Sprite ();
+				var circle = new Shape ();
 
 				circle.graphics.beginFill(color(graph_data.nodes[i].group).replace("#", "0x"));
-				circle.graphics.drawCircle(pt.x, pt.y, 10);
+				circle.graphics.drawCircle(pt.x, pt.y, nodeRadius);
 
-				// this.nodePts.push(pt);
-				this.addChild(circle);			
+				this.addChild(circle);							
 			}
+			
 			simulation.tick();
 		}
-
-		// console.log(graph_data.nodes[0].x);
-		// simulation.tick();
-		// console.log(graph_data.nodes[0].x)
-		// simulation.tick();
-		// console.log(graph_data.nodes[0].x)
-		// console.log(graph_data.nodes);
 	}
 	
 	// re-draw graph nodes on every tick
