@@ -4,6 +4,8 @@
   "private": true,
   "devDependencies": {
     "@types/core-js": "0.9.36",
+    "d3": "^7.0.0",
+    "d3-force": "^3.0.0",
     "openfl": "^7.0.0",
     "ts-loader": "^3.2.0",
     "typescript": "^2.6.2",
