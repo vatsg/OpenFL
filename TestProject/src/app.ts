@@ -53,11 +53,11 @@ class App extends Sprite {
 			.force("charge", d3.forceManyBody())
 			.force("link", d3.forceLink(graph_data.links))
 			.force("center", d3.forceCenter(width / 2, height / 2))
-			.stop();
-	    // .on("tick", this.updateGraph.bind(this));
+			// .stop();
+	    .on("tick", this.updateGraph.bind(this));
 	
 		// run simulation manually
-		simulation.tick(simLength);
+		// simulation.tick(simLength);
 		
 		// add links
 		for (let i = 0; i < graph_data.links.length; i++) {
@@ -116,7 +116,7 @@ class App extends Sprite {
 	}
 
 	// Attempt to speed up animation by transforming lines instead of re-drawing them
-	// UPDATE: Doesn't work properly. Need to fix.
+	// NOTE: Doesn't work properly. Need to fix.
 	private lineTransformation ():void {
 		for (let i = 0; i < graph_data.links.length; i++) {
 			var line = this.links[i];
