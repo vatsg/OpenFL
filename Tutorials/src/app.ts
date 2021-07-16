@@ -14,42 +14,42 @@ class App extends Sprite {
 
 		super ();
 
-		// this.graphics.beginFill(0x24AFC4);
-		// this.graphics.drawRect(0, 0, 100, 100);
+		this.graphics.beginFill(0x800000);
+		this.graphics.drawRect(300, 300, 100, 100);
 
-		// BitmapData.loadFromFile("openfl.png").onComplete((bitmapData) => {
-		// 	var bitmap = new Bitmap(bitmapData);
-		// 	bitmap.x = 10;
-		// 	bitmap.y = 200;
-		// 	bitmap.rotation = -10;
-		// 	bitmap.alpha = 0.5;
-		//
-		// 	let direction = true;
+		BitmapData.loadFromFile("openfl.png").onComplete((bitmapData) => {
+			var bitmap = new Bitmap(bitmapData);
+			bitmap.x = 500;
+			bitmap.y = 500;
+			bitmap.rotation = -10;
+			bitmap.alpha = 0.5;
+		
+			let direction = true;
 
-			// this.addEventListener (Event.ENTER_FRAME, (e:Event) => {
-			// 	if (direction) {
-			// 			bitmap.x += 1;
-			// 			if (bitmap.x >= 200) direction = !direction;
-			// 	} else {
-			// 			bitmap.x -= 1;
-			// 			if (bitmap.x <= 0) direction = !direction;
-			// 	}
-			// });
+			this.addEventListener (Event.ENTER_FRAME, (e:Event) => {
+				if (direction) {
+						bitmap.x += 1;
+						if (bitmap.x >= 200) direction = !direction;
+				} else {
+						bitmap.x -= 1;
+						if (bitmap.x <= 0) direction = !direction;
+				}
+			});
 
-			// let increment = -0.005;
-			// let timer = new Timer (1000 / 60, 200);
-			// timer.addEventListener (TimerEvent.TIMER, (e:TimerEvent) => {
-			// 	bitmap.alpha += increment;
-			// });
-			// timer.addEventListener (TimerEvent.TIMER_COMPLETE, (e:TimerEvent) => {
-			// 	increment *= -1;
-			// 	timer.reset ();
-			// 	timer.start ();
-			// });
-			// timer.start();
-			//
-			// this.addChild(bitmap);
-		// });
+			let increment = -0.005;
+			let timer = new Timer (1000 / 60, 200);
+			timer.addEventListener (TimerEvent.TIMER, (e:TimerEvent) => {
+				bitmap.alpha += increment;
+			});
+			timer.addEventListener (TimerEvent.TIMER_COMPLETE, (e:TimerEvent) => {
+				increment *= -1;
+				timer.reset ();
+				timer.start ();
+			});
+			timer.start();
+			
+			this.addChild(bitmap);
+		});
 
 
 		BitmapData.loadFromFile ("favicon.png").onComplete ((bitmapData) => {
@@ -114,5 +114,5 @@ class App extends Sprite {
 }
 
 
-var stage = new Stage (550, 400, 0xFFFFFF, App);
+var stage = new Stage (1000, 1000, 0xFFFFFF, App);
 document.body.appendChild (stage.element);
