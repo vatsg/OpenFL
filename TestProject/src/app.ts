@@ -5,6 +5,8 @@ import Point from "openfl/geom/Point";
 import TextField from "openfl/text/TextField";
 import TextFormat from "openfl/text/TextFormat";
 import Event from "openfl/events/Event";
+import KeyboardEvent from "openfl/events/KeyboardEvent";
+import Keyboard from "openfl/ui/Keyboard";
 // import * as d3 from 'd3-force';
 import * as d3 from 'd3';
 import { graph_data } from "./graphData";
@@ -41,6 +43,8 @@ class App extends Sprite {
 		title.y = 25;
 		title.width = 500;
 		this.addChild(title);
+		
+		this.stage.addEventListener (KeyboardEvent.KEY_DOWN, this.onKeyDown.bind(this));
 	}
 	
 	private createForceDirectedGraph ():void {
@@ -52,7 +56,7 @@ class App extends Sprite {
 			.stop();
 	    // .on("tick", this.updateGraph.bind(this));
 	
-		// run simulation
+		// run simulation manually
 		simulation.tick(simLength);
 		
 		// add links
@@ -111,76 +115,80 @@ class App extends Sprite {
 	}
 
 	// Attempt to speed up animation by transforming lines instead of re-drawing them
-	// UPDATE: Doesn't work properly. The math seems to be correct, but the lines are not drawn
-	// properly.	
+	// UPDATE: Doesn't work properly. Need to fix.
 	private lineTransformation ():void {
-		// for (let i = 0; i < graph_data.links.length; i++) {
-		// 	var line = this.links[i];
-		// 	var oldSrc = this.oldPts[i*2];
-		// 	var oldDst = this.oldPts[i*2 + 1];
-		// 	var newSrc = new Point(graph_data.links[i].source.x, graph_data.links[i].source.y);
-		// 	var newDst = new Point(graph_data.links[i].target.x, graph_data.links[i].target.y);
-		// 
-		// 	var s1 = (oldDst.y - oldSrc.y) / (oldDst.x - oldSrc.x); 
-		// 	var s2 = (newDst.y - newSrc.y) / (newDst.x - newSrc.x); 
-		// 	var a1 = Math.atan(s1);
-		// 	var a2 = Math.atan(s2);
-		// 	var rad = Math.atan((s1 - s2)/(1 + s1*s2));
-		// 	var ang = rad*180/Math.PI;
-		// 	if (oldSrc.x < newSrc.x) {
-		// 		ang = 180-ang;
-		// 		rad = ang * Math.PI / 180;
-		// 	}
-		// 	else {
-		// 		ang = 180-ang;
-		// 		rad = ang * Math.PI / 180;
-		// 	}
-		// 
-		// 	// console.log(ang);
-		// 
-		// 	var p1 = ((oldDst.x - oldSrc.x) * Math.cos(rad)) - ((oldDst.y - oldSrc.y) * Math.sin(rad)) + oldSrc.x;
-		// 	var p2 = ((oldDst.y - oldSrc.y) * Math.cos(rad)) + ((oldDst.x - oldSrc.x) * Math.sin(rad)) + oldSrc.y;
-		// 	p1 = p1 + (newSrc.x - oldSrc.x);
-		// 	p2 = p2 + (newSrc.y - oldSrc.y);
-		// 
-		// 	var scX = Math.abs((newDst.x - newSrc.x) / (p1 - newSrc.x))
-		// 	var scY = Math.abs((newDst.y - newSrc.y) / (p2 - newSrc.y));
-		// 	// console.log(scX, scY);
-		// 
-		// 	if (oldSrc.x < newSrc.x) {
-		// 		line.rotation+=ang;
-		// 		line.x = newSrc.x;
-		// 		line.y = newSrc.y;
-		// 
-		// 		line.scaleX = scX;
-		// 		line.scaleY = scY;
-		// 	}
-		// 	else {
-		// 		// console.log("Here?");
-		// 		line.rotation+=ang;
-		// 		line.x = newSrc.x;
-		// 		line.y = newSrc.y;
-		// 
-		// 		line.scaleX = scX;
-		// 		line.scaleY = scY;
-		// 	}
-		// 
-		// 	// line.rotation += 1;
-		// 	// line.scaleX += 1;
-		// 
-		// 	// console.log(line);
-		// 	// line.graphics.lineStyle (1, 0x808080);		
-		// 	// line.graphics.moveTo(graph_data.links[i].source.x, graph_data.links[i].source.y);
-		// 	// line.graphics.lineTo(graph_data.links[i].target.x, graph_data.links[i].target.y);
-		// 
-		// 	this.oldPts[i*2] = newSrc;
-		// 	this.oldPts[i*2 + 1] = newDst;
-		// 
-		// }
+		for (let i = 0; i < graph_data.links.length; i++) {
+			var line = this.links[i];
+			var oldSrc = this.oldPts[i*2];
+			var oldDst = this.oldPts[i*2 + 1];
+			var newSrc = new Point(graph_data.links[i].source.x, graph_data.links[i].source.y);
+			var newDst = new Point(graph_data.links[i].target.x, graph_data.links[i].target.y);
+
+			// calculate angle to rotate the old line by to be parallel to new line
+			var s1 = (oldDst.y - oldSrc.y) / (oldDst.x - oldSrc.x); 
+			var s2 = (newDst.y - newSrc.y) / (newDst.x - newSrc.x); 
+			var a1 = Math.atan(s1);
+			var a2 = Math.atan(s2);
+			var rad = Math.atan((s1 - s2)/(1 + s1*s2));
+			var ang = rad*180/Math.PI;
+			ang = 180-ang;
+			rad = ang * Math.PI / 180;
+		
+			// find endpoint of the rotated line
+			var p1 = ((oldDst.x - oldSrc.x) * Math.cos(rad)) - ((oldDst.y - oldSrc.y) * Math.sin(rad)) + oldSrc.x;
+			var p2 = ((oldDst.y - oldSrc.y) * Math.cos(rad)) + ((oldDst.x - oldSrc.x) * Math.sin(rad)) + oldSrc.y;
+			p1 = p1 + (newSrc.x - oldSrc.x);
+			p2 = p2 + (newSrc.y - oldSrc.y);
+		
+			// get scaling factor for rotated line
+			var scX = Math.abs((newDst.x - newSrc.x) / (p1 - newSrc.x))
+			var scY = Math.abs((newDst.y - newSrc.y) / (p2 - newSrc.y));
+			// console.log(scX, scY);
+		
+			// rotate and scale line to match new endpoints
+			line.rotation+=ang;
+			line.x = newSrc.x;
+			line.y = newSrc.y;
+	
+			line.scaleX = scX;
+			line.scaleY = scY;
+						
+			// update stored line endpoints
+			this.oldPts[i*2] = newSrc;
+			this.oldPts[i*2 + 1] = newDst;
+		}
 	}
 		
 	// zoom
+	private onKeyDown (event:KeyboardEvent):void {
+			var scaleChange = 0.1;
+			
+			if (event.keyCode == Keyboard.EQUAL) { // equal key used to zoom in
+				
+				// increase node sizes
+				for (let i = 0; i < graph_data.nodes.length; i++) {
+					var circle = this.nodes[i];
+					circle.scaleX += scaleChange;
+					circle.scaleY += scaleChange;
+				}				
+			}
+			else if (event.keyCode == Keyboard.MINUS) { // minus key used to zoom out
+				
+				// decrease node sizes
+				for (let i = 0; i < graph_data.nodes.length; i++) {
+					var circle = this.nodes[i];
+					circle.scaleX -= scaleChange;
+					circle.scaleY -= scaleChange;
+				}				
+			}
+	}
 	
+	private onKeyUp (event:KeyboardEvent):void {
+		
+	}
+	
+		
+		
 }
 
 
