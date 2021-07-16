@@ -24,7 +24,7 @@ class App extends Sprite {
 	
 	private nodes:Array<Shape>; 
 	private links:Array<Shape>;
-	private oldPts:Array<Point>;
+	private oldPts:Array<Point>; // use to store previous endpoints of links
 	
 	constructor () {
 		
@@ -64,10 +64,11 @@ class App extends Sprite {
 			var line = new Shape();
 			line.graphics.lineStyle (1, 0x808080);
 	
-			var srcPt = new Point(graph_data.links[i].source.x, graph_data.links[i].source.y);
-			var dstPt = new Point(graph_data.links[i].target.x, graph_data.links[i].target.y);
-			this.oldPts.push(srcPt);
-			this.oldPts.push(dstPt);
+			// Store the link endpoints -- to be used if attempting to transform links instead of re-drawing them
+			// var srcPt = new Point(graph_data.links[i].source.x, graph_data.links[i].source.y);
+			// var dstPt = new Point(graph_data.links[i].target.x, graph_data.links[i].target.y);
+			// this.oldPts.push(srcPt);
+			// this.oldPts.push(dstPt);
 			
 			line.graphics.moveTo(graph_data.links[i].source.x, graph_data.links[i].source.y);
 			line.graphics.lineTo(graph_data.links[i].target.x, graph_data.links[i].target.y);
@@ -92,7 +93,7 @@ class App extends Sprite {
 		// this.addEventListener (Event.ENTER_FRAME, this.updateGraph.bind(this));	// alternative to using d3 tick function
 	}
 	
-	// re-draw graph nodes on every tick
+	// update the positions of the graph nodes and edges on every tick
 	// NOTE: The animation runs slowly. 
 	private updateGraph ():void {
 	
@@ -159,11 +160,13 @@ class App extends Sprite {
 		}
 	}
 		
-	// zoom
+	// scale the nodes of the graph 
+	// increase scale by pressing the equal key
+	// decrease scale by pressing the minus key
 	private onKeyDown (event:KeyboardEvent):void {
 			var scaleChange = 0.1;
 			
-			if (event.keyCode == Keyboard.EQUAL) { // equal key used to zoom in
+			if (event.keyCode == Keyboard.EQUAL) { // equal key used to increase scale
 				
 				// increase node sizes
 				for (let i = 0; i < graph_data.nodes.length; i++) {
@@ -172,7 +175,7 @@ class App extends Sprite {
 					circle.scaleY += scaleChange;
 				}				
 			}
-			else if (event.keyCode == Keyboard.MINUS) { // minus key used to zoom out
+			else if (event.keyCode == Keyboard.MINUS) { // minus key used to decrease scale
 				
 				// decrease node sizes
 				for (let i = 0; i < graph_data.nodes.length; i++) {
@@ -181,14 +184,7 @@ class App extends Sprite {
 					circle.scaleY -= scaleChange;
 				}				
 			}
-	}
-	
-	private onKeyUp (event:KeyboardEvent):void {
-		
-	}
-	
-		
-		
+	}	
 }
 
 
